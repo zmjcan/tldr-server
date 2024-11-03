@@ -1,12 +1,9 @@
 from flask import Flask, request, jsonify
 import requests
 from bs4 import BeautifulSoup
+from prompting.prompts import generate_cohere_summary  # Import the Cohere function
 
 app = Flask(__name__)
-
-def generate_summary(text):
-    # Placeholder function for summary generation
-    return ' '.join(text.split()[:50]) + '...'
 
 @app.route('/api/scrape', methods=['POST'])
 def scrape_url():
@@ -16,7 +13,10 @@ def scrape_url():
         response = requests.get(url)
         soup = BeautifulSoup(response.text, 'html.parser')
         text = soup.get_text()
-        summary = generate_summary(text)
+        
+        # Use the Cohere API to generate a summary
+        summary = generate_cohere_summary(text)
+        
         return jsonify({'summary': summary})
     except Exception as e:
         return jsonify({'error': str(e)}), 500
